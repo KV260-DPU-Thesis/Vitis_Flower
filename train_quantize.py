@@ -33,20 +33,34 @@ def resize_image(input_dir):
 def build_model(input_shape=(224, 224, 3), num_classes=5):
     model = models.Sequential()
 
-    model.add(layers.Conv2D(16, (3, 3), activation='relu', input_shape=input_shape, strides=(2, 2), padding='same'))
+    model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=input_shape, strides=(2, 2), padding='same'))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Dropout(0.25))
+
+    model.add(layers.Conv2D(64, (3, 3), activation='relu', input_shape=input_shape, strides=(2, 2), padding='same'))
     model.add(layers.MaxPooling2D((2, 2)))
     model.add(layers.Dropout(0.25))
     
-    model.add(layers.Conv2D(32, (3, 3), activation='relu', strides=(2, 2), padding='same'))
+    model.add(layers.Conv2D(128, (3, 3), activation='relu', strides=(2, 2), padding='same'))
     model.add(layers.MaxPooling2D((2, 2)))
     model.add(layers.Dropout(0.25))
-    
-    model.add(layers.Conv2D(64, (3, 3), activation='relu', strides=(2, 2), padding='same'))
+
+    model.add(layers.Conv2D(256, (3, 3), activation='relu', strides=(2, 2), padding='same'))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Dropout(0.25))
+
+    model.add(layers.Conv2D(512, (3, 3), activation='relu', strides=(2, 2), padding='same'))
     model.add(layers.GlobalAveragePooling2D())
     model.add(layers.Dropout(0.25))
-    
-    model.add(layers.Dense(128, activation='relu'))
-    model.add(layers.Dropout(0.5))
+
+    model.add(layers.Dense(512, activation='relu'))
+    model.add(layers.Dropout(0.25))
+
+    model.add(layers.Dense(512, activation='relu'))
+    model.add(layers.Dropout(0.25))
+
+    model.add(layers.Dense(512, activation='relu'))
+    model.add(layers.Dropout(0.25))
     
     model.add(layers.Dense(num_classes, activation='softmax'))
 
@@ -77,7 +91,7 @@ model.compile(
     metrics = ['acc']
 )
 
-model.fit(X_train, y_train, epochs=30, validation_split=0.2, batch_size=16)
+model.fit(X_train, y_train, epochs=20, validation_split=0.2, batch_size=16)
 
 quantizer = vitis_quantize.VitisQuantizer(model)
 

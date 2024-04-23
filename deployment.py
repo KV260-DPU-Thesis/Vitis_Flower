@@ -69,7 +69,7 @@ for i, filename in enumerate(image_filenames):
 
     resultList = np.asarray(outputData[0])[0]
     resultIdx = resultList.argmax()
-    resultVal = resultList[resultIdx]
+    resultVal = resultList[0][0][resultIdx]
 
     # Print only the most accurate value
     print(f"Most accurate prediction for image {i}: {resultIdx} with value {resultVal:.5f}")
