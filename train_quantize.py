@@ -66,6 +66,45 @@ def build_model(input_shape=(224, 224, 3), num_classes=5):
 
     return model
 
+def build_heavier_model(input_shape=(224, 224, 3), num_classes=5):
+    model = models.Sequential()
+
+    # Increase filter numbers and add more convolutional layers
+    model.add(layers.Conv2D(64, (3, 3), activation='relu', input_shape=input_shape, strides=(1, 1), padding='same'))
+    model.add(layers.Conv2D(64, (3, 3), activation='relu', strides=(1, 1), padding='same'))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Dropout(0.25))
+
+    model.add(layers.Conv2D(128, (3, 3), activation='relu', strides=(1, 1), padding='same'))
+    model.add(layers.Conv2D(128, (3, 3), activation='relu', strides=(1, 1), padding='same'))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Dropout(0.25))
+
+    model.add(layers.Conv2D(256, (3, 3), activation='relu', strides=(1, 1), padding='same'))
+    model.add(layers.Conv2D(256, (3, 3), activation='relu', strides=(1, 1), padding='same'))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Dropout(0.25))
+
+    model.add(layers.Conv2D(512, (3, 3), activation='relu', strides=(1, 1), padding='same'))
+    model.add(layers.Conv2D(512, (3, 3), activation='relu', strides=(1, 1), padding='same'))
+    model.add(layers.GlobalAveragePooling2D())
+    model.add(layers.Dropout(0.25))
+
+    # Increase the number of units in dense layers
+    model.add(layers.Dense(1024, activation='relu'))
+    model.add(layers.Dropout(0.25))
+
+    model.add(layers.Dense(1024, activation='relu'))
+    model.add(layers.Dropout(0.25))
+
+    model.add(layers.Dense(1024, activation='relu'))
+    model.add(layers.Dropout(0.25))
+    
+    model.add(layers.Dense(num_classes, activation='softmax'))
+
+    return model
+
+
 resize_image("dataset/daisy/resized")
 resize_image("dataset/dandelion/resized")
 resize_image("dataset/rose/resized")
@@ -80,7 +119,7 @@ print(X.shape , y.shape)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True)
 print("Train and test datas are created successfully")
 
-model = build_model()
+model = build_heavier_model()
 
 model.summary()
 plot_model(model, to_file='flower_model.png', show_shapes=True, show_layer_names=True)
@@ -91,7 +130,7 @@ model.compile(
     metrics = ['acc']
 )
 
-model.fit(X_train, y_train, epochs=20, validation_split=0.2, batch_size=16)
+model.fit(X_train, y_train, epochs=1, validation_split=0.2, batch_size=16)
 
 quantizer = vitis_quantize.VitisQuantizer(model)
 
